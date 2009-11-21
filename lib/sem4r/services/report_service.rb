@@ -22,41 +22,64 @@
 ## -------------------------------------------------------------------
 
 module Sem4r
-  class AdgroupAdService
+  class ReportService
+
     include DefineCall
 
     def initialize(connector)
       @connector = connector
-      @service_namespace = "https://adwords.google.com/api/adwords/cm/v200909"
-      @header_namespace = @service_namespace
-      @service_url = "https://adwords-sandbox.google.com/api/adwords/cm/v200909/AdGroupAdService"
+      @service_url = "https://sandbox.google.com/api/adwords/v13/ReportService"
+      @namespace = "https://adwords.google.com/api/adwords/v13"
     end
 
-    define_call_v2009 :all, :adgrop_id
-    define_call_v2009 :create, :xml
+    define_call_v13 :all
+    define_call_v13 :validate, :job_xml
+    define_call_v13 :schedule, :job_xml
+    define_call_v13 :status, :job_id
+    define_call_v13 :url, :job_id
+
+    ################
+
+    def download(url, path_name)
+      @connector.download(url, path_name)
+    end
 
     private
 
-    def _all(adgroup_id)
+    def _all
       <<-EOFS
-      <get xmlns="#{@service_namespace}">
-        <selector>
-          <adGroupIds>#{adgroup_id}</adGroupIds>
-        </selector>
-      </get>
+      <getAllJobs xmlns:n1="#{@namespace}">
+      </getAllJobs>
       EOFS
     end
 
-    def _create(xml)
+    def _validate(job_xml)
+      soap_body_content = "<validateReportJob xmlns=\"#{@namespace}\">"
+      soap_body_content += job_xml
+      soap_body_content += "</validateReportJob>"
+      soap_body_content      
+    end
+
+    def _schedule(job_xml)
+      soap_body_content = "<scheduleReportJob xmlns=\"#{@namespace}\">"
+      soap_body_content += job_xml
+      soap_body_content += "</scheduleReportJob>"
+      soap_body_content
+    end
+
+    def _status(job_id)
       <<-EOFS
-      <mutate xmlns="#{@service_namespace}">
-        <operations xsi:type="AdGroupAdOperation">
-          <operator>ADD</operator>
-          <operand>
-            #{xml}
-          </operand>
-        </operations>
-      </mutate>
+        <getReportJobStatus xmlns:n1="#{@namespace}">
+          <reportJobId>#{job_id}</reportJobId>
+        </getReportJobStatus>
+      EOFS
+    end
+
+    def _url(job_id)
+      <<-EOFS
+      <getReportDownloadUrl xmlns="#{@namespace}">
+        <reportJobId>#{job_id}</reportJobId>
+      </getReportDownloadUrl>
       EOFS
     end
 

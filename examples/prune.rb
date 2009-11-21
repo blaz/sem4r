@@ -21,10 +21,39 @@
 ## WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ## -------------------------------------------------------------------
 
-module Sem4r
-  class CampaignCriterionService
-    def initialize
-    
+require File.dirname(__FILE__) + "/example_helper"
+
+# begin
+  adwords = Adwords.new
+  adwords.dump_soap_to( example_soap_log(__FILE__) )
+  # adwords.logger = example_logger(__FILE__)
+  adwords.logger = Logger.new(STDOUT)
+
+  puts "Prune empty campaigns and adgroups"
+
+  adwords.accounts.each do |account|
+    account.client_accounts.each do |client_account|
+      puts "examinate account '#{client_account.credentials.client_email}'"
+      client_account.campaigns.each do |campaign|
+
+        puts "examinate campaign '#{campaign.name}'"
+        campaign.adgroups.each do |adgroup|
+          if adgroup.empty?
+            puts "delete adgroup '#{adgroup.name}'"
+            adgroup.delete
+          end
+        end
+
+        if campaign.empty?
+          puts "delete campaign '#{campaign.name}'"
+          campaign.delete
+        end
+      end
     end
   end
-end
+
+  adwords.p_counters
+
+#rescue
+#  puts "I am so sorry! Something went wrong! (exception #{$!.to_s})"
+#end

@@ -21,10 +21,27 @@
 ## WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ## -------------------------------------------------------------------
 
-module Sem4r
-  class CampaignCriterionService
-    def initialize
-    
-    end
-  end
+require File.dirname(__FILE__) + "/example_helper"
+
+begin
+  adwords = Adwords.new
+  adwords.dump_soap_to( example_soap_log(__FILE__) )
+  adwords.logger = Logger.new(STDOUT)
+  # adwords.logger =  example_logger(__FILE__)
+
+  account = adwords.account
+  account.p_client_accounts
+
+  client_account = account.client_accounts.first
+  client_account.p_campaigns
+
+  client_account.p_campaigns
+  campaign = client_account.campaigns.first
+  campaign.p_adgroups
+
+  adgroup = campaign.adgroups.first
+  adgroup.p_criterions
+
+  # rescue
+  #   puts "I am so sorry! Something went wrong! (exception #{$!.to_s})"
 end

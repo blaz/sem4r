@@ -22,9 +22,18 @@
 ## -------------------------------------------------------------------
 
 module Sem4r
-  class CampaignCriterionService
-    def initialize
-    
+  class SoapFault
+
+    attr_reader :faultcode
+    attr_reader :faultstring
+
+    def initialize(faultcode, faultstring)
+      @faultcode = faultcode
+      @faultstring - faultstring
+    end
+
+    def to_s
+      "#{@faultode} #{@faultstring}"
     end
   end
 end

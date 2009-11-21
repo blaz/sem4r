@@ -21,43 +21,48 @@
 ## WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ## -------------------------------------------------------------------
 
+require 'sem4r/services/soap_fault'
+require 'sem4r/services/soap_connector'
+require 'sem4r/services/soap_message_v13'
+require 'sem4r/services/soap_message_v2009'
+require 'sem4r/services/define_call'
+
 module Sem4r
-  class AdgroupAdService
-    include DefineCall
+  class Service
 
     def initialize(connector)
       @connector = connector
-      @service_namespace = "https://adwords.google.com/api/adwords/cm/v200909"
-      @header_namespace = @service_namespace
-      @service_url = "https://adwords-sandbox.google.com/api/adwords/cm/v200909/AdGroupAdService"
     end
 
-    define_call_v2009 :all, :adgrop_id
-    define_call_v2009 :create, :xml
+    ###########################################################################
+    # services v13
 
-    private
-
-    def _all(adgroup_id)
-      <<-EOFS
-      <get xmlns="#{@service_namespace}">
-        <selector>
-          <adGroupIds>#{adgroup_id}</adGroupIds>
-        </selector>
-      </get>
-      EOFS
+    %w{ account report traffic_estimator }.each do |service|
+      klass_name = service.split('_').map{|p| p.capitalize}.join('')
+      str=<<-EOFR
+        require 'sem4r/services/#{service}_service'
+        def #{service}
+          return @#{service}_service if @#{service}_service
+          @#{service}_service = #{klass_name}Service.new(@connector)
+        end
+      EOFR
+      eval str
     end
 
-    def _create(xml)
-      <<-EOFS
-      <mutate xmlns="#{@service_namespace}">
-        <operations xsi:type="AdGroupAdOperation">
-          <operator>ADD</operator>
-          <operand>
-            #{xml}
-          </operand>
-        </operations>
-      </mutate>
-      EOFS
+    ###########################################################################
+    # services v2009
+
+    %w{ ad_extension_override adgroup adgroup_ad adgroup_criterion campaign
+        campaign_criterion campaign_target info targeting_idea }.each do |service|      
+      klass_name = service.split('_').map{|p| p.capitalize}.join('')
+      str=<<-EOFR
+        require 'sem4r/services/#{service}_service'
+        def #{service}
+          return @#{service}_service if @#{service}_service
+          @#{service}_service = #{klass_name}Service.new(@connector)
+        end
+      EOFR
+      eval str
     end
 
   end
