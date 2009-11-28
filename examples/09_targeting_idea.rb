@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # Copyright (c) 2009 Giovanni Ferro gf@sem4r.com
-#
+# 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -8,10 +8,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-#
+# 
 # The above copyright notice and this permission notice shall be
 # included in all copies or substantial portions of the Software.
-#
+# 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -19,33 +19,41 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#
+# 
 # -------------------------------------------------------------------------
 
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.dirname(__FILE__) + "/example_helper"
+puts "---------------------------------------------------------------------"
+puts "Running #{File.basename(__FILE__)}"
+puts "---------------------------------------------------------------------"
 
-describe Credentials do
+begin
 
-  it "should have getter" do
-    connector = SoapConnector.new
-    connector.should_receive(:authentication_token).and_return("auth_token")
+  #
+  # config stuff
+  #
 
-    credentials = Credentials.new(
-      :environment => "sandbox",
-      :email => "prova",
-      :password => "prova",
-      :developer_token => "prova",
-      :application_token => "prova")
+  #  config = {
+  #    :email           => "",
+  #    :password        => "",
+  #    :developer_token => ""
+  #  }
+  # adwords = Adwords.sandbox(config)
 
-    credentials.email.should           eql "prova"
-    credentials.password.should        eql "prova"
-    credentials.developer_token.should eql "prova"
-    #
-    # no connector
-    #
-    lambda { credentials.authentication_token }.should raise_error
+  adwords = Adwords.sandbox             # search credentials into ~/.sem4r file
 
-    credentials.connector= connector
-    credentials.authentication_token.should eql "auth_token"
-  end
+  adwords.dump_soap_to( example_soap_log(__FILE__) )
+  adwords.logger = Logger.new(STDOUT)
+  # adwords.logger =  example_logger(__FILE__)
+
+  #
+  # example body
+  #
+
+  adwords.account.targeting_idea
+
+  # rescue Sem4rError
+  #   puts "I am so sorry! Something went wrong! (exception #{$!.to_s})"
 end
+
+puts "---------------------------------------------------------------------"

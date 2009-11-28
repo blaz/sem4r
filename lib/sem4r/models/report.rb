@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------
-# Copyright (c) 2009 Giovanni Ferro giovanni.ferro@gmail.com
+# Copyright (c) 2009 Giovanni Ferro gf@sem4r.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -158,11 +158,11 @@ module Sem4r
 
     def self.from_element(account, el)
       new(account) do
-        @id     = el.elements["id"].text
-        name      el.elements["name"].text
-        start_day el.elements["startDay"].text
-        end_day   el.elements["endDay"].text
-        status    el.elements["status"].text
+        @id       = el.elements["id"].text         # id is read only
+        name        el.elements["name"].text
+        start_day   el.elements["startDay"].text
+        end_day     el.elements["endDay"].text
+        @status   = el.elements["status"].text     # status is read only
       end
     end
 

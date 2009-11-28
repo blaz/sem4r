@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # Copyright (c) 2009 Giovanni Ferro gf@sem4r.com
-#
+# 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -8,10 +8,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-#
+# 
 # The above copyright notice and this permission notice shall be
 # included in all copies or substantial portions of the Software.
-#
+# 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -19,33 +19,48 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#
+# 
 # -------------------------------------------------------------------------
 
-require File.dirname(__FILE__) + '/../spec_helper'
+module Sem4r
+  class AdParamService
+    include SoapCall
 
-describe Credentials do
+    def initialize(connector)
+      @connector = connector
 
-  it "should have getter" do
-    connector = SoapConnector.new
-    connector.should_receive(:authentication_token).and_return("auth_token")
+      @service_namespace = "https://adwords.google.com/api/adwords/cm/v200909"
+      @header_namespace = @service_namespace
 
-    credentials = Credentials.new(
-      :environment => "sandbox",
-      :email => "prova",
-      :password => "prova",
-      :developer_token => "prova",
-      :application_token => "prova")
+      @sandbox_service_url    = "https://adwords-sandbox.google.com/api/adwords/cm/v200909/AdParamService"
+      @production_service_url = "https://adwords.google.com/api/adwords/cm/v200909/AdParamService"
+    end
 
-    credentials.email.should           eql "prova"
-    credentials.password.should        eql "prova"
-    credentials.developer_token.should eql "prova"
-    #
-    # no connector
-    #
-    lambda { credentials.authentication_token }.should raise_error
+    define_call_v2009 :all, :adgrop_id
+    define_call_v2009 :set, :xml
 
-    credentials.connector= connector
-    credentials.authentication_token.should eql "auth_token"
+    private
+
+    def _all(adgroup_id)
+      <<-EOFS
+      <get xmlns="#{@service_namespace}">
+        <selector>
+          <adGroupIds>#{adgroup_id}</adGroupIds>
+        </selector>
+      </get>
+      EOFS
+    end
+
+    def _set(xml)
+      <<-EOFS
+      <mutate xmlns="#{@service_namespace}">
+        <operations xsi:type="AdParamOperation">
+          <operator>SET</operator>
+          <operand>#{xml}</operand>
+        </operations>
+      </mutate>
+      EOFS
+    end
+
   end
 end

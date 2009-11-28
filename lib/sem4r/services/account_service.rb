@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------
-# Copyright (c) 2009 Giovanni Ferro giovanni.ferro@gmail.com
+# Copyright (c) 2009 Giovanni Ferro gf@sem4r.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,7 +23,7 @@
 
 module Sem4r
   class AccountService
-    include DefineCall
+    include SoapCall
 
     def initialize(connector)
       @connector = connector

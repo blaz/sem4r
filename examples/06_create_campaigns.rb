@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------
-# Copyright (c) 2009 Giovanni Ferro giovanni.ferro@gmail.com
+# Copyright (c) 2009 Giovanni Ferro gf@sem4r.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -116,7 +116,7 @@ begin
   
   adwords.p_counters
 
-rescue Sem4Error
+rescue Sem4rError
   puts "I am so sorry! Something went wrong! (exception #{$!.to_s})"
 end
 

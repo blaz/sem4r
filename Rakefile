@@ -11,7 +11,7 @@ begin
     gem.name = "sem4r"
     gem.summary = %Q{library to access google adwords api}
     gem.description = %Q{ruby library to access google adwords api}
-    gem.email = "giovanni.ferro@gmail.com"
+    gem.email = "gf@sem4r.com"
     gem.homepage = "http://github.com/gf/sem4r"
     gem.authors = ["Giovanni Ferro"]
     gem.add_dependency 'patron'
@@ -80,15 +80,13 @@ end
 task :test => :check_dependencies
 task :default => :spec
 
-#
-# examples
-#
-desc "Start an IRB shell"
-task :shell do
-  sh 'IRBRC=`pwd`/config/irbrc.rb irb'
-end
+###############################################################################
+# Sem4r
 
 namespace :sem4r do
+  #
+  # examples
+  #
   desc 'run all example'
   task :examples do
 
@@ -100,5 +98,10 @@ namespace :sem4r do
     end
     puts "All examples run successfull"
 
+  end
+
+  desc "Start an IRB shell"
+  task :shell do
+    sh 'IRBRC=`pwd`/config/irbrc.rb irb'
   end
 end
