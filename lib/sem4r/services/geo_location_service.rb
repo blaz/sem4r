@@ -22,66 +22,36 @@
 # -------------------------------------------------------------------
 
 module Sem4r
-  class ReportService
-
+  class GeoLocationService
     include SoapCall
 
     def initialize(connector)
       @connector = connector
-      @namespace = "https://adwords.google.com/api/adwords/v13"
 
-      @sandbox_service_url    = "https://sandbox.google.com/api/adwords/v13/ReportService"
-      @production_service_url = "https://adwords.google.com/api/adwords/v13/ReportService"
+      @header_namespace  = "https://adwords.google.com/api/adwords/cm/v200909"
+      @service_namespace = @header_namespace
+
+      @sandbox_service_url    = "https://adwords-sandbox.google.com/api/adwords/cm/v200909/GeoLocationService"
+      @production_service_url = "https://adwords.google.com/api/adwords/cm/v200909/GeoLocationService"
     end
 
-    define_call_v13 :all
-    define_call_v13 :validate, :job_xml
-    define_call_v13 :schedule, :job_xml
-    define_call_v13 :status, :job_id
-    define_call_v13 :url, :job_id
+    define_call_v2009 :get, :xml
 
     ################
 
-    def download(url, path_name)
-      @connector.download(url, path_name)
-    end
-
     private
 
-    def _all
+    def _get(xml)
       <<-EOFS
-      <getAllJobs xmlns:n1="#{@namespace}">
-      </getAllJobs>
-      EOFS
-    end
-
-    def _validate(job_xml)
-      soap_body_content = "<validateReportJob xmlns=\"#{@namespace}\">"
-      soap_body_content += job_xml
-      soap_body_content += "</validateReportJob>"
-      soap_body_content      
-    end
-
-    def _schedule(job_xml)
-      soap_body_content = "<scheduleReportJob xmlns=\"#{@namespace}\">"
-      soap_body_content += job_xml
-      soap_body_content += "</scheduleReportJob>"
-      soap_body_content
-    end
-
-    def _status(job_id)
-      <<-EOFS
-        <getReportJobStatus xmlns:n1="#{@namespace}">
-          <reportJobId>#{job_id}</reportJobId>
-        </getReportJobStatus>
-      EOFS
-    end
-
-    def _url(job_id)
-      <<-EOFS
-      <getReportDownloadUrl xmlns="#{@namespace}">
-        <reportJobId>#{job_id}</reportJobId>
-      </getReportDownloadUrl>
+      <s:get>
+        <s:selector>
+          <addresses>
+            <streetAddress>Via Nazionale,10</streetAddress>
+            <cityName>Rome</cityName>
+            <countryCode>IT</countryCode>
+          </addresses>
+        </s:selector>
+      </s:get>
       EOFS
     end
 
