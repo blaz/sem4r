@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------
-# Copyright (c) 2009-2010 Giovanni Ferro gf@sem4r.com
+# Copyright (c) 2009 Giovanni Ferro gf@sem4r.com
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,44 +23,9 @@
 # -------------------------------------------------------------------------
 
 module Sem4r
-  class AdParamService
-    include SoapCall
-
-    def initialize(connector)
-      @connector = connector
-
-      @service_namespace = "https://adwords.google.com/api/adwords/cm/v200909"
-      @header_namespace = @service_namespace
-
-      @sandbox_service_url    = "https://adwords-sandbox.google.com/api/adwords/cm/v200909/AdParamService"
-      @production_service_url = "https://adwords.google.com/api/adwords/cm/v200909/AdParamService"
+  class MobileAdImage
+    def initialize(mobile_ad, &block)
+      @mobile_ad = mobile_ad
     end
-
-    soap_call_v2009 :all, :adgrop_id
-    soap_call_v2009 :set, :xml
-
-    private
-
-    def _all(adgroup_id)
-      <<-EOFS
-      <get xmlns="#{@service_namespace}">
-        <selector>
-          <adGroupIds>#{adgroup_id}</adGroupIds>
-        </selector>
-      </get>
-      EOFS
-    end
-
-    def _set(xml)
-      <<-EOFS
-      <mutate xmlns="#{@service_namespace}">
-        <operations xsi:type="AdParamOperation">
-          <operator>SET</operator>
-          <operand>#{xml}</operand>
-        </operations>
-      </mutate>
-      EOFS
-    end
-
   end
 end

@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------
-# Copyright (c) 2009 Giovanni Ferro gf@sem4r.com
+# Copyright (c) 2009-2010 Giovanni Ferro gf@sem4r.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -102,7 +102,6 @@ module Sem4r
       str += <<-EOFS
         <useragent env:mustUnderstand="0">#{credentials.useragent}</useragent>
         <developerToken env:mustUnderstand="0">#{credentials.developer_token}</developerToken>
-        <applicationToken env:mustUnderstand="0">#{credentials.application_token}</applicationToken>
       </env:Header>
       EOFS
       str

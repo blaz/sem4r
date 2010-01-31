@@ -22,45 +22,25 @@
 # 
 # -------------------------------------------------------------------------
 
-module Sem4r
-  class AdParamService
-    include SoapCall
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
-    def initialize(connector)
-      @connector = connector
+describe AdgroupMobileAd do
+  before(:each) do
+    @adgroup = mock("adgroup").as_null_object
+  end
 
-      @service_namespace = "https://adwords.google.com/api/adwords/cm/v200909"
-      @header_namespace = @service_namespace
-
-      @sandbox_service_url    = "https://adwords-sandbox.google.com/api/adwords/cm/v200909/AdParamService"
-      @production_service_url = "https://adwords.google.com/api/adwords/cm/v200909/AdParamService"
+  it "should desc" do
+    mobile_ad = AdgroupMobileAd.new(@adgroup) do
+      markup HTML
+      carrier 'T-Mobile@US'
+      carrier 'Verizon@US'
+      image  do
+        name       'image_192x53.jpg'
+        data       MOBILE_IMAGE_DATA
+        dimension  'SHRUNKEN: 192x53'
+      end
     end
-
-    soap_call_v2009 :all, :adgrop_id
-    soap_call_v2009 :set, :xml
-
-    private
-
-    def _all(adgroup_id)
-      <<-EOFS
-      <get xmlns="#{@service_namespace}">
-        <selector>
-          <adGroupIds>#{adgroup_id}</adGroupIds>
-        </selector>
-      </get>
-      EOFS
-    end
-
-    def _set(xml)
-      <<-EOFS
-      <mutate xmlns="#{@service_namespace}">
-        <operations xsi:type="AdParamOperation">
-          <operator>SET</operator>
-          <operand>#{xml}</operand>
-        </operations>
-      </mutate>
-      EOFS
-    end
-
+    mobile_ad.markups.should include(AdgroupMobileAd::HTML)
   end
 end
+

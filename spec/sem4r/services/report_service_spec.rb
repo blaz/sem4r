@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------
-# Copyright (c) 2009 Giovanni Ferro gf@sem4r.com
+# Copyright (c) 2009-2010 Giovanni Ferro gf@sem4r.com
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -34,7 +34,6 @@ describe ReportService do
     @credentials.should_receive(:client_email).and_return(nil)
     @credentials.should_receive(:useragent).and_return("sem4r")
     @credentials.should_receive(:developer_token).and_return("dev_token")
-    @credentials.should_receive(:application_token).and_return("appl_token")
   end
 
   it "should accept all message" do
@@ -45,7 +44,7 @@ describe ReportService do
     report_service = ReportService.new(connector)
     soap_message = report_service.all( @credentials )
 
-          els = REXML::XPath.match( soap_message.response, "//getAllJobsResponse/getAllJobsReturn")
+    els = REXML::XPath.match( soap_message.response, "//getAllJobsResponse/getAllJobsReturn")
     els.should_not be_empty
     els.should have(4).elements
   end

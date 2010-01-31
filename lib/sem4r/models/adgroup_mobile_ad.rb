@@ -23,43 +23,39 @@
 # -------------------------------------------------------------------------
 
 module Sem4r
-  class AdParamService
-    include SoapCall
+  class AdgroupMobileAd < AdgroupAd
 
-    def initialize(connector)
-      @connector = connector
+    enum :Markups, [
+      :CHTML,
+      :HTML,
+      :WML,
+      :XHTML
+    ]
 
-      @service_namespace = "https://adwords.google.com/api/adwords/cm/v200909"
-      @header_namespace = @service_namespace
-
-      @sandbox_service_url    = "https://adwords-sandbox.google.com/api/adwords/cm/v200909/AdParamService"
-      @production_service_url = "https://adwords.google.com/api/adwords/cm/v200909/AdParamService"
+    def initialize(adgroup, &block)
+      super( adgroup )
+      self.type = MobileAd
+      if block_given?
+        instance_eval(&block)
+        # save
+      end
     end
 
-    soap_call_v2009 :all, :adgrop_id
-    soap_call_v2009 :set, :xml
+    # MobileAd
+    g_accessor :headline
+    g_accessor :description
+    g_set_accessor :markup, {:values_in => :Markups}
+    g_set_accessor :carrier
+    g_accessor :businessName
+    g_accessor :country_code
+    g_accessor :phone_number
 
-    private
-
-    def _all(adgroup_id)
-      <<-EOFS
-      <get xmlns="#{@service_namespace}">
-        <selector>
-          <adGroupIds>#{adgroup_id}</adGroupIds>
-        </selector>
-      </get>
-      EOFS
+    def image
+      @image
     end
 
-    def _set(xml)
-      <<-EOFS
-      <mutate xmlns="#{@service_namespace}">
-        <operations xsi:type="AdParamOperation">
-          <operator>SET</operator>
-          <operand>#{xml}</operand>
-        </operations>
-      </mutate>
-      EOFS
+    def image(&block)
+      @image = MobileAdImage.new(self, &block)
     end
 
   end

@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------
-# Copyright (c) 2009-2010 Giovanni Ferro gf@sem4r.com
+# Copyright (c) 2009 Giovanni Ferro gf@sem4r.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,7 +27,6 @@ puts "Running #{File.basename(__FILE__)}"
 puts "---------------------------------------------------------------------"
 
 begin
-
   #
   # config stuff
   #
@@ -49,65 +48,29 @@ begin
   # example body
   #
 
-  puts "Create example campaigns"
-  client_account = adwords.account.client_accounts.first
+  puts "Prune empty campaigns and adgroups"
 
-  campaign = Campaign.create(client_account) do
-    name "campaign #{Time.now}"
-  end
-  puts "created campaign '#{campaign.name}' with id '#{campaign.id}'"
-  
-  adgroup = Adgroup.create(campaign) do
-    name "adgroup #{Time.now}"
-  end
-  puts "created adgroup '#{adgroup.name}' with id '#{adgroup.id}'"
+  adwords.accounts.each do |account|
+    account.client_accounts.each do |client_account|
+      puts "examinate account '#{client_account.credentials.client_email}'"
+      client_account.campaigns.each do |campaign|
 
-  adgroup_ad = AdgroupTextAd.new(adgroup) do
-    url           "http://www.pluto.com"
-    display_url   "www.Pluto.com"
-    headline      "Vieni da noi"
-    description1  "vieni da noi"
-    description2  "arivieni da noi"
-  end
-  puts "created ad with id '#{adgroup_ad.id}'"
+        puts "examinate campaign '#{campaign.name}'"
+        campaign.adgroups.each do |adgroup|
+          if adgroup.empty?
+            puts "delete adgroup '#{adgroup.name}'"
+            adgroup.delete
+          end
+        end
 
-  CriterionKeyword.new(adgroup) do
-    text       "pippo"
-    match      BROAD
-  end
-
-  CriterionKeyword.new(adgroup) do
-    text       "pluto"
-    match      BROAD
-  end
-
-  CriterionKeyword.new(adgroup) do
-    text       "paperino"
-    match      BROAD
-  end
-
-  CriterionPlacement.new(adgroup) do
-    url       "http://github.com"
-  end
-
-
-  #
-  # dsl
-  #
-
-  adgroup_dsl = campaign.adgroup do
-    name "adgroup dsl #{Time.now}"
-
-    keyword do
-      text  "dsl paperino"
-      match BROAD
+        if campaign.empty?
+          puts "delete campaign '#{campaign.name}'"
+          campaign.delete
+        end
+      end
     end
   end
 
-  campaign.p_adgroups(true)
-  adgroup.p_criterions(true)
-  adgroup_dsl.p_criterions(true)
-  
   adwords.p_counters
 
 rescue Sem4rError
