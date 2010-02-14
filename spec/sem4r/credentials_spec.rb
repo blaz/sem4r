@@ -40,11 +40,12 @@ describe Credentials do
     credentials.password.should        eql "prova"
     credentials.developer_token.should eql "prova"
     #
-    # no connector
+    # no connector so raise error
     #
     lambda { credentials.authentication_token }.should raise_error
 
     credentials.connector= connector
     credentials.authentication_token.should eql "auth_token"
   end
+  
 end

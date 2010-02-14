@@ -24,46 +24,27 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
-describe SoapMessageV13 do
+describe AdGroupAdOperation do
 
-  include Sem4rSpecHelper
-
-  before(:all) do
-    @credentials = mock("credentials")
-    # @credentials.should_receive(:sandbox?).and_return(true)
-    @credentials.should_receive(:email).and_return("example@gmail.com")
-    @credentials.should_receive(:password).and_return("secret")
-    @credentials.should_receive(:client_email).and_return(nil)
-    @credentials.should_receive(:useragent).and_return("sem4r")
-    @credentials.should_receive(:developer_token).and_return("dev_token")
+  before(:each) do
+    @adgroup = mock("adgroup").as_null_object
+    @ad_operation = AdGroupAdOperation.new
   end
 
-  it "should update counters" do
-    response_xml = read_xml_file("services", "report_service", "all.xml")
-    connector = mock("connector")
-    connector.should_receive(:send).and_return(response_xml)
-
-    message_v13 = SoapMessageV13.new(connector, @credentials)
-    message_v13.body = ""
-    message_v13.send("service_url", "soap_action")
-
-    message_v13.counters.should_not be_empty
-    message_v13.counters.should ==  { :response_time => 279, :operations => 4, :units => 4 }
+  it "should raise missing operand" do
+    @ad_operation.operator "ADD"
+    @ad_operation.operator.should == "ADD"
+    lambda {  @ad_operation.to_xml }.should raise_error(Sem4rError)
   end
 
-
-#  def test_foo
-#
-#    credentials = Credentials.new({
-#        :email           =>     "email",
-#        :password        =>     "password",
-#        :developer_token =>     "developer_token"})
-#    soapmessage = SoapMessageV2009.new(credentials, "mynamespace")
-#    soapmessage.body= "<myop></myop>"
-#
-#    str = soapmessage.build_soap_message
-#
-#    puts str
- # end
+  it "should produce xml" do
+    @adgroup.should_receive(:id).and_return(10)
+    text_ad = AdGroupTextAd.new(@adgroup)
+    text_ad.headline     = "headline"
+    text_ad.description1 = "description1"
+    text_ad.description2 = "description2"
+    @ad_operation.add text_ad
+    @ad_operation.to_xml
+  end
 
 end

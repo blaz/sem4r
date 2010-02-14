@@ -24,23 +24,56 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
-describe AdgroupMobileAd do
-  before(:each) do
-    @adgroup = mock("adgroup").as_null_object
+
+describe Criterion do
+
+  include Sem4rSpecHelper
+
+  before do
+    services = stub("services")
+    mock_service_ad_group_criterion(services)
+    @adgroup = adgroup_mock(services)
   end
 
-  it "should desc" do
-    mobile_ad = AdgroupMobileAd.new(@adgroup) do
-      markup HTML
-      carrier 'T-Mobile@US'
-      carrier 'Verizon@US'
-      image  do
-        name       'image_192x53.jpg'
-        data       MOBILE_IMAGE_DATA
-        dimension  'SHRUNKEN: 192x53'
+  describe CriterionKeyword do
+
+    it "should accept a block" do
+      keyword = CriterionKeyword.new(@adgroup) do
+        text       "pippo"
+        match      "BROAD"
       end
+      keyword.text.should  == "pippo"
+      keyword.match.should == "BROAD"
+      keyword.id.should    == 10
     end
-    mobile_ad.markups.should include(AdgroupMobileAd::HTML)
-  end
-end
 
+    it "should parse xml" do
+      el = read_model("//entries/criterion", "services", "ad_group_criterion_service", "get-res.xml")
+      keyword = CriterionKeyword.from_element(@adgroup, el)
+      keyword.id.should == 11536082
+      keyword.text.should == "pippo"
+      keyword.match.should == "BROAD"
+    end
+
+  end
+
+  describe CriterionPlacement do
+
+    it "should accept a block" do
+      keyword = CriterionPlacement.new(@adgroup) do
+        url       "http://github.com"
+      end
+      keyword.url.should  == "http://github.com"
+      keyword.id.should    == 10
+    end
+
+    it "should parse xml" do
+      el = read_model("//criterion", "services", "ad_group_criterion_service", "mutate_add_criterion_placement-res.xml")
+      placement = CriterionPlacement.from_element(@adgroup, el)
+      placement.id.should == 11536085
+      placement.url.should == "github.com"
+    end
+
+  end
+
+end
