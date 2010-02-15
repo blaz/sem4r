@@ -21,31 +21,28 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # -------------------------------------------------------------------
 
-
 require File.dirname(__FILE__) + "/example_helper"
 
 run_example(__FILE__) do |adwords|
-  account = adwords.account
-  account.p_reports
 
-  report = account.report do
-    name                 "Test Report"
-    type                 "Structure"
-    start_day            "2009-01-01"
-    end_day              "2009-01-31"
-    aggregation          "Keyword"
-    column               "Campaign"
-    column               "AdGroup"
-    column               "Keyword"
-    column               "KeywordTypeDisplay"
+  puts "Create example campaigns"
+  client_account = adwords.account.client_accounts.first
+
+  campaign = client_account.campaign "campaign #{Time.now}" do
+    ad_group "adgroup #{Time.now}" do
+      text_ad do
+        url           "http://www.pluto.com"
+        display_url   "www.Pluto.com"
+        headline      "Vieni da noi"
+        description1  "vieni da noi"
+        description2  "arivieni da noi"
+      end
+      keyword "pippo", "BROAD"
+      keyword "pluto", "BROAD"
+      placement "http://github.com"
+    end
   end
 
-  report.validate
-  job = report.schedule
-  job.wait(5) { |r, s| puts "status #{s}" }
-  report.download(tmp_dirname + "/05_request_report.xml")
+  campaign.p_ad_groups(true)
 
-  account.p_reports(true)
-  report = account.reports.first
-  puts report.status(true)
 end

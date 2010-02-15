@@ -22,45 +22,21 @@
 # -------------------------------------------------------------------
 
 require File.dirname(__FILE__) + "/example_helper"
-puts "---------------------------------------------------------------------"
-puts "Running #{File.basename(__FILE__)}"
-puts "---------------------------------------------------------------------"
 
-begin
-  #
-  # config stuff
-  #
-
-  #  config = {
-  #    :email           => "",
-  #    :password        => "",
-  #    :developer_token => ""
-  #  }
-  # adwords = Adwords.sandbox(config)
-
-  adwords = Adwords.sandbox             # search credentials into ~/.sem4r file
-
-  # adwords.dump_soap_to( example_soap_log(__FILE__) )
-  adwords.logger = Logger.new(STDOUT)
-  # adwords.logger =  example_logger(__FILE__)
-
-  #
-  # example body
-  #
-
-  puts "List Adgroup Advertising"
+run_example(__FILE__) do |adwords|
+  puts "List AdGroup Advertising"
 
   adwords.account.client_accounts.each do |client_account|
     puts "examinate account '#{client_account.credentials.client_email}'"
     client_account.campaigns.each do |campaign|
       puts "examinate campaign '#{campaign}'"
-      campaign.adgroups.each do |adgroup|
-        puts "examinate adgroup '#{adgroup}'"
-        adgroup.ads.each do |ad|
+      campaign.ad_groups.each do |ad_group|
+        puts "examinate adgroup '#{ad_group}'"
+        ad_group.ads.each do |ad|
           row = []
           row << client_account.credentials.client_email
           row << campaign.name
-          row << adgroup.name
+          row << ad_group.name
           row << ad.url
           row << ad.display_url
           puts row.join(",")
@@ -68,11 +44,4 @@ begin
       end
     end
   end
-
-  adwords.p_counters
-
-rescue Sem4rError
-  puts "I am so sorry! Something went wrong! (exception #{$!.to_s})"
 end
-
-puts "---------------------------------------------------------------------"
