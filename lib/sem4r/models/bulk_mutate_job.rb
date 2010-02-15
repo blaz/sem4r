@@ -23,40 +23,60 @@
 # -------------------------------------------------------------------------
 
 module Sem4r
-  class AdgroupMobileAd < AdgroupAd
+  class BulkMutateJob
+    include SoapAttributes
 
-    enum :Markups, [
-      :CHTML,
-      :HTML,
-      :WML,
-      :XHTML
-    ]
+    attr_reader :id
+    attr_accessor :campaign_id
 
-    def initialize(adgroup, &block)
-      super( adgroup )
-      self.type = MobileAd
-      if block_given?
-        instance_eval(&block)
-        # save
+    g_accessor :status
+
+    def initialize(&block)
+      instance_eval(&block) if block_given?
+    end
+
+    def add_operation(operation)
+      @operations ||= []
+      @operations << operation
+    end
+
+    def to_xml
+      xml =<<-EOS
+      <request>
+        <partIndex>0</partIndex>
+        <operationStreams>
+          <scopingEntityId>
+            <type>CAMPAIGN_ID</type>
+            <value>#{campaign_id}</value>
+          </scopingEntityId>
+      EOS
+
+      if @operations
+        @operations.each do |operation|
+          xml += "<operations xsi:type=\"AdGroupAdOperation\">"
+          xml += operation.to_xml
+          xml += "</operations>"
+        end
+      end
+   
+      xml +=<<-EOS
+        </operationStreams>
+      </request>
+      <numRequestParts>1</numRequestParts>
+      EOS
+    end
+
+    def self.from_element(el)
+      new do
+        @id          = el.elements["id"].text.strip.to_i
+        status         el.elements["status"].text
       end
     end
 
-    # MobileAd
-    g_accessor :headline
-    g_accessor :description
-    g_set_accessor :markup, {:values_in => :Markups}
-    g_set_accessor :carrier
-    g_accessor :businessName
-    g_accessor :country_code
-    g_accessor :phone_number
-
-    def image
-      @image
-    end
-
-    def image(&block)
-      @image = MobileAdImage.new(self, &block)
+    def to_s
+      "#{@id} #{status}"
     end
 
   end
+
 end

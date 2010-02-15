@@ -21,22 +21,65 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # -------------------------------------------------------------------
 
-require 'yaml'
-require 'pathname'
+module Sem4r
+  class AdGroupAd < Base
 
-cwd = Pathname(__FILE__).dirname
-$:.unshift(cwd.to_s) unless $:.include?(cwd.to_s) || $:.include?(cwd.expand_path.to_s)
+    #
+    # Ad.type
+    #
+    enum :Types, [
+      :DeprecatedAd,
+      :MobileAd,
+      :TextAd,
+      :MobileImageAd,
+      :ImageAd,
+      :LocalBusinessAd,
+      :TemplateAd
+    ]
 
-require 'rubygems'
-require 'sem4r/adwords'
+    #
+    # AdGroupAd.Status
+    #
+    enum :Statuses, [
+      :ENABLED,
+      :PAUSED,
+      :DISABLED
+    ]
 
-module Sem4r #:nodoc:
-  def self.version
-    cwd = Pathname(__FILE__).dirname.expand_path.to_s
-    yaml = YAML.load_file(cwd + '/../VERSION.yml')
-    major = (yaml['major'] || yaml[:major]).to_i
-    minor = (yaml['minor'] || yaml[:minor]).to_i
-    patch = (yaml['patch'] || yaml[:patch]).to_i
-    "#{major}.#{minor}.#{patch}"
+    #
+    # Ad.ApprovalStatus
+    #
+    enum :ApprovalStatus, [
+      :APPROVED,
+      :FAMILY_SAFE,
+      :NON_FAMILY_SAFE,
+      :PORN,
+      :UNCHECKED, # Pending review
+      :DISAPPROVED
+    ]
+
+    attr_reader   :id
+    attr_reader   :ad_group
+    attr_accessor :type
+
+    # g_reader :type
+    g_accessor :url
+    g_accessor :display_url
+
+    def initialize(ad_group)
+      super( ad_group.adwords, ad_group.credentials )
+      @ad_group = ad_group
+    end
+
+    def self.from_element( ad_group, el )
+      xml_type =       el.elements["Ad.Type"].text
+      case xml_type
+      when TextAd
+        AdGroupTextAd.from_element(ad_group, el)
+      when MobileAd
+        AdGroupMobileAd.from_element(ad_group, el)
+      end
+    end
+
   end
 end

@@ -24,13 +24,27 @@
 module Sem4r
   class CriterionPlacement < Criterion
 
-    def initialize(adgroup, &block)
-      super( adgroup )
+    g_accessor :url
+
+    def initialize(ad_group, url = nil, &block)
+      super( ad_group )
       self.type = Placement
+      self.url = url unless url.nil?
       if block_given?
         instance_eval(&block)
         save
       end
+    end
+
+    def self.from_element( ad_group, el )
+      new(ad_group) do
+        @id      = el.elements["id"].text.strip.to_i
+        url        el.elements["url"].text
+      end
+    end
+
+    def self.create(ad_group, &block)
+      new(ad_group, &block).save
     end
 
     def to_s
@@ -44,53 +58,6 @@ module Sem4r
           </criterion>
         EOFS
       str
-    end
-
-    ###########################################################################
-
-    g_accessor :url
-
-    ###########################################################################
-    # <entries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="BiddableAdGroupCriterion">
-    #    <adGroupId>5000010567</adGroupId>
-    #    <criterion xsi:type="Keyword">
-    #        <id>10008027</id>
-    #        <Criterion.Type>Keyword</Criterion.Type>
-    #        <text>pippo</text>
-    #        <matchType>BROAD</matchType>
-    #    </criterion>
-    #    <AdGroupCriterion.Type>BiddableAdGroupCriterion</AdGroupCriterion.Type>
-    #    <userStatus>ACTIVE</userStatus>
-    #    <systemServingStatus>ELIGIBLE</systemServingStatus>
-    #    <approvalStatus>PENDING_REVIEW</approvalStatus>
-    #    <bids xsi:type="ManualCPCAdGroupCriterionBids">
-    #        <AdGroupCriterionBids.Type>ManualCPCAdGroupCriterionBids</AdGroupCriterionBids.Type>
-    #        <maxCpc>
-    #            <amount>
-    #                <ComparableValue.Type>Money</ComparableValue.Type>
-    #                <microAmount>10000000</microAmount>
-    #            </amount>
-    #        </maxCpc>
-    #        <bidSource>ADGROUP</bidSource>
-    #    </bids>
-    #    <qualityInfo>
-    #        <qualityScore>5</qualityScore>
-    #    </qualityInfo>
-    #    <stats>
-    #        <network>SEARCH</network>
-    #        <Stats.Type>Stats</Stats.Type>
-    #    </stats>
-    #</entries>
-
-    def self.from_element( adgroup, el )
-      new(adgroup) do
-        @id      = el.elements["id"].text
-        url        el.elements["url"].text
-      end
-    end
-
-    def self.create(adgroup, &block)
-      new(adgroup, &block).save
     end
 
   end

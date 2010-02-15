@@ -21,22 +21,47 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # -------------------------------------------------------------------
 
-require 'yaml'
-require 'pathname'
+module Sem4r
+  class AdGroupCriterionService
+    include SoapCall
 
-cwd = Pathname(__FILE__).dirname
-$:.unshift(cwd.to_s) unless $:.include?(cwd.to_s) || $:.include?(cwd.expand_path.to_s)
+    def initialize(connector)
+      @connector = connector
+      @service_namespace = "https://adwords.google.com/api/adwords/cm/v200909"
+      @header_namespace = @service_namespace
 
-require 'rubygems'
-require 'sem4r/adwords'
+      @sandbox_service_url = "https://adwords-sandbox.google.com/api/adwords/cm/v200909/AdGroupCriterionService"
+    end
 
-module Sem4r #:nodoc:
-  def self.version
-    cwd = Pathname(__FILE__).dirname.expand_path.to_s
-    yaml = YAML.load_file(cwd + '/../VERSION.yml')
-    major = (yaml['major'] || yaml[:major]).to_i
-    minor = (yaml['minor'] || yaml[:minor]).to_i
-    patch = (yaml['patch'] || yaml[:patch]).to_i
-    "#{major}.#{minor}.#{patch}"
+    soap_call_v2009 :all, :ad_group_id
+    soap_call_v2009 :create, :ad_group_id, :xml
+
+    private
+    
+    def _all(ad_group_id)
+      <<-EOFS
+      <get xmlns="#{@service_namespace}">
+        <selector>
+          <idFilters>
+            <adGroupId>#{ad_group_id}</adGroupId>
+          </idFilters>
+        </selector>
+      </get>
+      EOFS
+    end
+
+    def _create(ad_group_id, xml)
+      <<-EOFS
+      <mutate xmlns="#{@service_namespace}">
+        <operations xsi:type="AdGroupCriterionOperation">
+          <operator>ADD</operator>
+          <operand xsi:type="BiddableAdGroupCriterion">
+            <adGroupId>#{ad_group_id}</adGroupId>
+            #{xml}
+           </operand>
+        </operations>
+      </mutate>
+      EOFS
+    end
   end
 end

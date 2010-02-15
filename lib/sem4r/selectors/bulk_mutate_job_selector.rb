@@ -23,11 +23,32 @@
 # -------------------------------------------------------------------------
 
 module Sem4r
+  class BulkMutateJobSelector
+    include SoapAttributes
 
-  class MobileAdImage
-    def initialize(mobile_ad, &block)
-      @mobile_ad = mobile_ad
+    def initialize(&block)
+      instance_eval(&block) if block_given?
     end
-  end
 
+    enum :JobStatuses, [
+      :COMPLETED,
+      :PROCESSING,
+      :FAILED,
+      :PENDING]
+
+    def to_xml
+      <<-EOFS
+        <selector>
+          <customerJobKeys></customerJobKeys>
+          <jobStatuses>COMPLETED</jobStatuses>
+          <jobStatuses>PROCESSING</jobStatuses>
+          <jobStatuses>FAILED</jobStatuses>
+          <jobStatuses>PENDING</jobStatuses>
+        </selector>
+      EOFS
+    end
+
+    ##########################################################################
+
+  end
 end

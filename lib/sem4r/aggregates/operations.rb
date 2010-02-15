@@ -24,10 +24,79 @@
 
 module Sem4r
 
-  class MobileAdImage
-    def initialize(mobile_ad, &block)
-      @mobile_ad = mobile_ad
+  class Operation
+    include SoapAttributes
+
+    enum :Operations, [
+      :ADD,
+      :REMOVE,
+      :SET]
+
+    g_accessor :operator
+  end
+
+  def add(operand)
+    operator "ADD"
+    @operand = operand
+  end
+
+  def remove(operand)
+    operator "REMOVE"
+    @operand = operand
+  end
+
+  def set(operand)
+    operator "SET"
+    @operand = operand
+  end
+
+  def to_xml
+    if @operand == nil
+      raise Sem4rError, "Missing Operand"
     end
+    xml =<<-EOS
+        <operator>#{operator}</operator>
+        <operand xsi:type="BulkMutateJob">
+          #{@operand.to_xml}
+        </operand>
+    EOS
+    xml
+  end
+
+  class AdGroupAdOperation < Operation
+
+    def initialize(&block)
+      instance_eval(&block) if block_given?
+    end
+
+    def operation_type
+      "AdGroupAdOperation"
+    end
+
+  end
+
+  class AdGroupCriterionOperation < Operation
+
+    def initialize(&block)
+      instance_eval(&block) if block_given?
+    end
+
+    def operation_type
+      "AdGroupCriterionOperation"
+    end
+
+  end
+
+  class JobOperation < Operation
+
+    def initialize(&block)
+      instance_eval(&block) if block_given?
+    end
+
+    def operation_type
+      "JobOperation"
+    end
+
   end
 
 end
