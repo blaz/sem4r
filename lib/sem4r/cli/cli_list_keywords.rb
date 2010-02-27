@@ -1,6 +1,6 @@
-# -------------------------------------------------------------------
+# -------------------------------------------------------------------------
 # Copyright (c) 2009-2010 Giovanni Ferro gf@sem4r.com
-#
+# 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -8,10 +8,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-#
+# 
 # The above copyright notice and this permission notice shall be
 # included in all copies or substantial portions of the Software.
-#
+# 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -19,25 +19,35 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-# -------------------------------------------------------------------
+# 
+# -------------------------------------------------------------------------
 
-require 'yaml'
-require 'pathname'
-require 'rubygems'
-require 'builder'
+module Sem4r
+  CliListKeywords = simple_cli_command("keywords", "list keywords") do |account |
+    account.client_accounts.each do |client_account|
+      puts "examinate account '#{client_account.credentials.client_email}'"
+      client_account.campaigns.each do |campaign|
+        puts "examinate campaign '#{campaign}'"
+        campaign.ad_groups.each do |ad_group|
+          ad_group.criterions.each do |criterion|
+            row = []
+            row << client_account.credentials.client_email
+            row << campaign.name
+            row << ad_group.name
 
-cwd = Pathname(__FILE__).dirname
-$:.unshift(cwd.to_s) unless $:.include?(cwd.to_s) || $:.include?(cwd.expand_path.to_s)
+            row << criterion.type
+            case criterion.type
+            when Criterion::Keyword
+              row << criterion.text
+              row << criterion.match
+            when Criterion::Placement
+              row << criterion.url
+            end
 
-require 'sem4r/adwords'
-
-module Sem4r #:nodoc:
-  def self.version
-    cwd = Pathname(__FILE__).dirname.expand_path.to_s
-    yaml = YAML.load_file(cwd + '/../VERSION.yml')
-    major = (yaml['major'] || yaml[:major]).to_i
-    minor = (yaml['minor'] || yaml[:minor]).to_i
-    patch = (yaml['patch'] || yaml[:patch]).to_i
-    "#{major}.#{minor}.#{patch}"
+            puts row.join(",")
+          end
+        end
+      end
+    end
   end
 end

@@ -24,14 +24,22 @@
 
 module Sem4r
 
+  class CliCommand
+    def parse_and_run(argv)
+    end
+  end
+
+
+
   def self.simple_cli_command(command_name, description_str, &block)
 
-    cls = Class.new do
-      def initialize(account)
-        @account = account
+    cls = Class.new(CliCommand) do
+      def initialize(main_cli, get_account)
+        @main_cli = main_cli
+        @get_account = get_account
       end
 
-      def command_opt_parser(options)
+      def opt_parser(options)
         opt_parser = OptionParser.new
         opt_parser.banner= "#{self.class.description}"
         opt_parser.on("-h", "--help", "show this message") do
@@ -40,11 +48,12 @@ module Sem4r
         end
       end
 
-      define_method("run") do |argv|
+      define_method("parse_and_run") do |argv|
         options = OpenStruct.new
-        command_opt_parser(options).parse( argv )
+        opt_parser(options).parse( argv )
         return false if options.exit
-        block.call(@account)
+        account = @get_account.get_account
+        block.call(account)
       end
     end
 
