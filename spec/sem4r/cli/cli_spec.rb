@@ -26,15 +26,45 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 
 describe "cli" do
+  include Sem4rSpecHelper
 
-  it "should divide command line arguments into two sets" do
-pending "Test"
-    args = %w{ -a -b -cc command -d --ee -f}
+  
+  describe CliSem do
+    
+    it "should show help" do
+      out = with_stdout_captured do
+        cli = CliSem.new
+        args = %w{ -h }
+        cli.parse_and_run(args)
+      end
+      out.should match("Usage")  
+    end
+    
+  end
 
-    args1, command, args2 = split_args(args)
-    args1.should == %w{-a -b -cc}
-    command.should == "command"
-    args2.should == %w{-d --ee -f}
+  describe CliGetAccount do
+
+    it "should show help and exit" do
+      ret = true
+      out = with_stdout_captured do
+        args = %w{ -h }
+        cmd = CliGetAccount.new
+        ret = cmd.parse(args)
+      end
+      out.should match("Usage")
+      ret.should be_false
+    end
+
+    it "should show version and exit" do
+      ret = true
+      out = with_stdout_captured do
+        args = %w{ --version }
+        cmd = CliGetAccount.new
+        ret = cmd.parse(args)
+      end
+      out.should match("sem4r version")
+      ret.should be_false
+    end
 
   end
 

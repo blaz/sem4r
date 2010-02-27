@@ -24,46 +24,25 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
-describe BulkMutateJob do
-  include Sem4rSpecHelper, AggregatesSpecHelper
+describe AdGroupCriterionBids do
+  include Sem4rSpecHelper
 
-  before do
-    @adgroup = mock("adgroup").as_null_object
+  describe ManualCPCAdGroupCriterionBids do
+
+    it "shoud accept accessor" do
+      bids = ManualCPCAdGroupCriterionBids.new
+      bids.max_cpc 10000000
+      puts bids.to_xml
+    end
+
+    it "should parse xml" do
+      el = read_model("//bids", "services", "ad_group_criterion_service", "get-res.xml")
+      bids = AdGroupCriterionBids.from_element(el)
+
+      bids.bid_source.should == "ADGROUP"
+      bids.max_cpc.should == 10000000
+    end
+  
   end
 
-  it "should accept type accessor" do
-    # @adgroup.should_receive(:id).and_return(10)
-
-    text_ad = AdGroupTextAd.new(@adgroup)
-    text_ad.headline     = "headline"
-    text_ad.description1 = "description1"
-    text_ad.description2 = "description2"
-
-    ad_operation = AdGroupAdOperation.new
-    ad_operation.add text_ad
-
-    job = BulkMutateJob.new
-    job.campaign_id = 100
-    job.add_operation ad_operation
-
-    job.should have(1).operations
-  end
-
-  it "should parse xml" do
-    el = read_model("//rval", "services", "bulk_mutate_job_service", "get-res.xml")
-    job = BulkMutateJob.from_element(el)
-    job.id.should == 56889
-    job.status.should == "PENDING"
-  end
-
-  it "should have a representation in xml" do
-    @adgroup.stub(:id).and_return(3060284754)
-    @campaign = stub("campaign")
-    @campaign.stub(:id).and_return(100)
-    job = create_bulk_mutate_job(@campaign, @adgroup)
-
-    expected = read_model("//operand", "services", "bulk_mutate_job_service", "mutate-req.xml")
-    job.to_xml('operand').should xml_equivalent(expected)
-  end
 end
-

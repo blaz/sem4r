@@ -34,22 +34,22 @@ describe Account do
     mock_service_account(services)
     mock_service_info(services)
     mock_service_campaign(services)
-    # mock_service_ad_group_criterion(services)
+    mock_service_report(services)
     # @account = mock_account(services)
     @adwords = mock_adwords(services)
     @credentials = mock_credentials
+
+      @account = Account.new(@adwords, @credentials)
   end
 
   describe "account management" do
 
     it "should retrieve info" do
-      account = Account.new(@adwords, @credentials)
-      account.currency_code.should == "EUR"
+      @account.currency_code.should == "EUR"
     end
 
     it "should retrieve cost" do
-      account = Account.new(@adwords, @credentials)
-      account.year_unit_cost("UNIT_COUNT").should == 100
+      @account.year_unit_cost("UNIT_COUNT").should == 100
     end
 
   end
@@ -57,22 +57,20 @@ describe Account do
   describe "campaign management" do
 
     it "should add an Campaign with method 'campaign' + block" do
-      account = Account.new(@adwords, @credentials)
-      account.campaign do
+      @account.campaign do
         name "campaign"
       end
-      account.campaigns.length.should   ==  1
-      campaign = account.campaigns.first
+      @account.campaigns.length.should   ==  1
+      campaign = @account.campaigns.first
       campaign.id.should == 10
       campaign.name.should == "campaign"
     end
 
     it "should add an Campaign with method 'campaign' + param" do
-      account = Account.new(@adwords, @credentials)
-      account.campaign "campaign"
+      @account.campaign "campaign"
       
-      account.campaigns.length.should   ==  1
-      campaign = account.campaigns.first
+      @account.campaigns.length.should   ==  1
+      campaign = @account.campaigns.first
       campaign.id.should == 10
       campaign.name.should == "campaign"
     end
@@ -82,7 +80,7 @@ describe Account do
   describe "reports management" do
 
     it "should show reports " do
-      pending "test"
+      @account.should have(4).reports
     end
 
   end
