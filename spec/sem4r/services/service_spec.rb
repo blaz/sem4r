@@ -24,36 +24,23 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
-describe AdParam do
-
+describe Service do
   include Sem4rSpecHelper
 
-  before(:each) do
-    services = stub("services")
-    mock_service_ad_param(services)
-    # mock_service_ad_group_criterion(services)
-    # mock_service_ad_group_ad(services)
-    @adgroup   = adgroup_mock(services)
-    @criterion = criterion_mock(services)
-  end
- 
-  it "should accepts a block" do
-    ad_param = AdParam.new(@adgroup, @criterion) do
-      index  1
-      text   "testo"
-    end
-    ad_param.index.should == 1
-    ad_param.text.should  == "testo"
-  end
+#  before(:all) do
+#    @credentials = mock("credentials")
+#    # @credentials.should_receive(:sandbox?).and_return(true)
+#    @credentials.should_receive(:email).and_return("example@gmail.com")
+#    @credentials.should_receive(:password).and_return("secret")
+#    @credentials.should_receive(:client_email).and_return(nil)
+#    @credentials.should_receive(:useragent).and_return("sem4r")
+#    @credentials.should_receive(:developer_token).and_return("dev_token")
+#  end
 
-  it "should parse xml" do
-    @adgroup.should_receive(:find_criterion).with(100).and_return(@criterion)
-    el = read_model("//rval", "services", "ad_param_service", "mutate_set-res.xml")
-    ad_param = AdParam.from_element(@adgroup, el)
-    ad_param.index.should == 1
-    ad_param.text.should  == "$99.99"
+  it "should contains ad_group service" do
+    connector = mock("connector")
+    s = Service.new(connector)
+    s.ad_group.should_not == nil
   end
 
 end
-
- 

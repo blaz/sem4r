@@ -22,7 +22,7 @@
 # 
 # -------------------------------------------------------------------------
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 
 describe Account do
@@ -31,10 +31,10 @@ describe Account do
 
   before do
     services = stub("services")
-    mock_service_account(services)
-    mock_service_info(services)
-    mock_service_campaign(services)
-    mock_service_report(services)
+    stub_service_account(services)
+    stub_service_info(services)
+    stub_service_campaign(services)
+    stub_service_report(services)
     # @account = mock_account(services)
     @adwords = mock_adwords(services)
     @credentials = mock_credentials
