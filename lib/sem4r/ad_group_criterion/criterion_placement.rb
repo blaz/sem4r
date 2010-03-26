@@ -51,15 +51,16 @@ module Sem4r
       "#{@id} #{@type} #{@url}"
     end
 
+    def xml(t)
+      t.criterion("xsi:type" => "#{type}") do |ad|
+        ad.url  url
+      end
+    end
+
     def to_xml(tag)
-      unless tag.class == Builder::XmlMarkup
-        builder = Builder::XmlMarkup.new
-        tag = builder.tag!(tag, "xsi:type" => "CriterionKeyword")
-      end
-      tag.criterion("xsi:type" => "#{type}") do |ad|
-        ad.url        url
-      end
-      tag.to_s
+      builder = Builder::XmlMarkup.new
+      t = builder.tag!(tag, "xsi:type" => "CriterionKeyword")
+      xml(t)
     end
   end
 end

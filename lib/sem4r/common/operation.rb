@@ -72,38 +72,4 @@ module Sem4r
 
   end
 
-  class AdGroupAdOperation < Operation
-
-    def initialize(&block)
-      @operation_type = "AdGroupAdOperation"
-      instance_eval(&block) if block_given?
-    end
-
-  end
-
-  class AdGroupCriterionOperation < Operation
-
-    def initialize(&block)
-      @operation_type = "AdGroupCriterionOperation"
-      instance_eval(&block) if block_given?
-    end
-
-  end
-
-  class JobOperation < Operation
-
-    def initialize(&block)
-      @operation_type = "JobOperation"
-      instance_eval(&block) if block_given?
-    end
-
-  end
-
-  class AdGroupCriterionOperation
-    def initialize(&block)
-      @operation_type = "AdGroupCriterionOperation"
-      instance_eval(&block) if block_given?
-    end
-
-  end
 end
